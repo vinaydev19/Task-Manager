@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const listScheme = new Schema(
+const tagScheme = new Schema(
   {
     name: {
       type: String,
@@ -15,5 +15,4 @@ const listScheme = new Schema(
   { timestamps: true }
 );
 
-
-export const List = mongoose.model("List", listScheme);
+export const Tag = mongoose.model("Tag", tagScheme);

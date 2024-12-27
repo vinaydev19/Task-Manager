@@ -1,1 +1,1 @@
-export const DB_NAME = "taskManagerDB"
+export const DB_NAME = "TaskManager"

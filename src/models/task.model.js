@@ -4,40 +4,42 @@ const taskScheme = new Schema(
   {
     title: {
       type: String,
-      required: String,
+      required: true,
     },
-    checked: {
+    description: {
+      type: String,
+    },
+    dueDate: {
+      type: Date,
+    },
+    priority: {
+      type: String,
+      enum: ["High", "Medium", "Low"],
+    },
+    isCompleted: {
       type: Boolean,
       default: false,
     },
-    date: {
-      type: String,
+    reminderDate: {
+      type: Date,
     },
-    remainderTime: {
-      type: String,
-    },
-    file: {
-      type: String,
-    },
-    notes: {
-      type: String,
-    },
-    repeat: {
-      type: String,
-      enum: ["daily", "weekly", "Weekdays", "Weekly", "Monthly", "Yearly"],
-    },
+    tags: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Tag",
+      },
+    ],
     listId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "List",
     },
     userId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      require: true,
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 export const Task = mongoose.model("Task", taskScheme);
