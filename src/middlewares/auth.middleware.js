@@ -1,11 +1,16 @@
 import jwt from "jsonwebtoken";
-import { User } from "../models/user.model";
+import { User } from "../models/user.model.js";
 
 export const verifyJWT = async (req, resp, next) => {
   try {
     const token =
-      req.cookie?.accessToken ||
-      req.header("Authorization")?.replace("bearer ", "");
+      req.cookies?.accessToken ||
+      req.header("Authorization")?.replace("Bearer ", "");
+
+    console.log(token);
+
+    console.log("Cookies:", req.cookies);
+    console.log("Authorization Header:", req.header("Authorization"));
 
     if (!token) {
       return resp.status(401).json({
@@ -14,12 +19,9 @@ export const verifyJWT = async (req, resp, next) => {
       });
     }
 
-    const decodedToken =  jwt.verify(
-      token,
-      process.env.ACCESS_TOKEN_SECRET
-    );
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-    const user = await User.findById(decodedToken._id).select(
+    const user = await User.findById(decodedToken?._id).select(
       "-password -refreshToken"
     );
 
@@ -32,7 +34,7 @@ export const verifyJWT = async (req, resp, next) => {
 
     req.user = user;
 
-    next()
+    next();
   } catch (error) {
     console.log("invalid access token", error);
     throw error;

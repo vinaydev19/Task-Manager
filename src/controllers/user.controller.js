@@ -5,14 +5,14 @@ import jwt from "jsonwebtoken";
 const generateAccessTokenAndRefreshToken = async (userId) => {
   try {
     const user = await User.findById(userId);
-    const AccessToken = user.generateAccessToken();
+    const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
     user.refreshToken = refreshToken;
 
     await user.save({ validateBeforeSave: false });
 
-    return { AccessToken, refreshToken };
+    return { accessToken, refreshToken };
   } catch (error) {
     console.log(`error on generate AccessToken and refreshToken`);
     throw error;
@@ -46,7 +46,7 @@ const registerUser = async function (req, resp) {
       $or: [{ email }, { username }],
     });
 
-    if (!findTheUser) {
+    if (findTheUser) {
       return resp.status(400).json({
         status: 400,
         message: "User already exists on this username or email",
@@ -89,21 +89,13 @@ const loginUser = async function (req, resp) {
     const { email, username, password } = req.body;
 
     // validate the data
-    if ([email, username, password].some((field) => field.trim() === "")) {
+    if (!email && !username ) {
       return resp.status(400).json({
         status: 400,
         message: "all field are required",
       });
     }
 
-    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-
-    if (!emailRegex.test(email)) {
-      return resp.status(400).json({
-        status: 400,
-        message: "Email is invalid",
-      });
-    }
 
     // find the user in db
 
@@ -132,9 +124,7 @@ const loginUser = async function (req, resp) {
     const { accessToken, refreshToken } =
       await generateAccessTokenAndRefreshToken(user._id);
 
-    const loggedInUser = await User.findById(user._id).select(
-      "-password - refreshToken"
-    );
+    const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
 
     const options = {
       httpOnly: true,
